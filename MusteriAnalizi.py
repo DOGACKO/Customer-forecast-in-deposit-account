@@ -23,6 +23,7 @@ df_train.nunique()
 df_train.nunique()
 df_train['y'] = df_train['y'].map({'no': 0, 'yes': 1})
 #%%
+## I CHECK MY TARGET VALUE
 labels = 'Reach', 'No Reach'
 sizes = [df_train.y[df_train['y']==1].count(), df_train.y[df_train['y']==0].count()]
 explode = (0, 0.1)
@@ -40,6 +41,7 @@ sns.countplot(x='education', hue = 'y',data = df_train, ax=axarr[1][0])
 sns.countplot(x='contact', hue = 'y',data = df_train, ax=axarr[1][1])
 
 #%%
+# Change my values to categorigal value
 df_train['job'] = df_train['job'].astype('category').cat.codes
 df_train['marital'] = df_train['marital'].astype('category').cat.codes
 df_train['education'] = df_train['education'].astype('category').cat.codes
@@ -52,6 +54,7 @@ df_train['poutcome'] = df_train['poutcome'].astype('category').cat.codes
 
 
 #%%
+#Slipt my data
 X = df_train.drop('y', axis=1)
 y=df_train['y'].values
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_state=42)
@@ -60,6 +63,7 @@ print("X_test shape:", X_test.shape)
 print("y_train shape:", y_train.shape)
 print("y_test shape:", y_test.shape)
 #%%
+#I fixed my target value because it is not balance
 unique_values, counts = np.unique(y_train, return_counts=True)
 class_distribution = dict(zip(unique_values, counts))
 print(class_distribution)
@@ -154,6 +158,7 @@ plt.ylabel('True Positive Rate')
 plt.legend()
 plt.show()
 #%%
+## CHOOSE BEST MODEL
 auc_values = [logreg_auc, xgb_auc, rf_auc, de_auc]
 model_names = ['Logistic Regression', 'XGBoost', 'Random Forest', 'Decision Tree']
 
@@ -167,7 +172,9 @@ best_model_auc = auc_values[best_model_index]
 print(f"The best model is {best_model_name} with AUC = {best_model_auc:.2f}")
 
 #%%
+# TRY TO TEST DATA SET
 df_test= pd.read_csv("C:/Users/Msi/Desktop/CALISMALAR/Musteri/test.csv")
+
 df_test['job'] = df_test['job'].astype('category').cat.codes
 df_test['marital'] = df_test['marital'].astype('category').cat.codes
 df_test['education'] = df_test['education'].astype('category').cat.codes
@@ -191,8 +198,8 @@ df_test['predicted_target'] = ['no' if pred == 0 else 'yes' for pred in y_test_p
 conf_matrix = confusion_matrix(df_test['y'], df_test['predicted_target'])
 #%%
 sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues')
-plt.xlabel('Tahmin Edilen Etiketler')
-plt.ylabel('Gerçek Etiketler')
+plt.xlabel('Prediction')
+plt.ylabel('Real')
 plt.title('Confusion Matrix')
 plt.show()
 #%%

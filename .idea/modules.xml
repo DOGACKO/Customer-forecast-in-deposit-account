@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../Money Detection/.idea/Money Detection.iml" filepath="$PROJECT_DIR$/../Money Detection/.idea/Money Detection.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/Musteri.iml" filepath="$PROJECT_DIR$/.idea/Musteri.iml" />
     </modules>
   </component>
