@@ -1,4 +1,8 @@
 #%%
+# ==============================
+# We import our libary
+# ==============================
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
@@ -12,19 +16,30 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier
 from xgboost import XGBClassifier
 import numpy as np
+from imblearn.over_sampling import SMOTE
 #%%
+
 df_train= pd.read_csv("C:/Users/Msi/Desktop/CALISMALAR/Musteri/train.csv")
+
 #%%
+# ==============================
+#we check our data
+# ==============================
 print(df_train.shape)
 df_train.info()
 #%%
 df_train.nunique()
 #%%
-df_train.nunique()
+# ==============================
+#we converted our target value to binary format
+# ==============================
 df_train['y'] = df_train['y'].map({'no': 0, 'yes': 1})
 #%%
-## I CHECK MY TARGET VALUE
-labels = 'Reach', 'No Reach'
+
+# ==============================
+# Visualization
+# ==============================
+labels = 'Yes', 'NO'
 sizes = [df_train.y[df_train['y']==1].count(), df_train.y[df_train['y']==0].count()]
 explode = (0, 0.1)
 fig1, ax1 = plt.subplots(figsize=(10, 8))
@@ -34,6 +49,9 @@ ax1.axis('equal')
 plt.title("Reach vs No Reach", size = 20)
 plt.show()
 #%%
+# ==============================
+# Visualization
+# ==============================
 fig, axarr = plt.subplots(2, 2, figsize=(20, 12))
 #sns.countplot(x='job', hue = 'y',data = df_train, ax=axarr[0][0])
 sns.countplot(x='loan', hue = 'y',data = df_train, ax=axarr[0][1])
@@ -41,7 +59,9 @@ sns.countplot(x='education', hue = 'y',data = df_train, ax=axarr[1][0])
 sns.countplot(x='contact', hue = 'y',data = df_train, ax=axarr[1][1])
 
 #%%
-# Change my values to categorigal value
+# ==============================
+# We made our categorical data categorical
+# ==============================
 df_train['job'] = df_train['job'].astype('category').cat.codes
 df_train['marital'] = df_train['marital'].astype('category').cat.codes
 df_train['education'] = df_train['education'].astype('category').cat.codes
@@ -54,7 +74,10 @@ df_train['poutcome'] = df_train['poutcome'].astype('category').cat.codes
 
 
 #%%
-#Slipt my data
+#
+# ==============================
+# Slipt my data
+# ==============================
 X = df_train.drop('y', axis=1)
 y=df_train['y'].values
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_state=42)
@@ -63,7 +86,9 @@ print("X_test shape:", X_test.shape)
 print("y_train shape:", y_train.shape)
 print("y_test shape:", y_test.shape)
 #%%
-#I fixed my target value because it is not balance
+# ==============================
+# Since the target value was unbalanced, we balanced them using smote.
+# ==============================
 unique_values, counts = np.unique(y_train, return_counts=True)
 class_distribution = dict(zip(unique_values, counts))
 print(class_distribution)
@@ -92,7 +117,9 @@ else:
     print("\nNo significant class imbalance. SMOTE not applied.")
 #
 #%%
-#Logistic
+# ==============================
+# LOGISTIC REGRESSION MODEL
+# ==============================
 logreg_model = make_pipeline(StandardScaler(), LogisticRegression(max_iter=1000))  # max_iter değerini artırabilirsiniz
 logreg_model.fit(X_train, y_train)
 logreg_predictions = logreg_model.predict(X_test)
@@ -101,7 +128,9 @@ print("Logistic Regression Accuracy:", logreg_accuracy)
 print("Logistic Regression Classification Report:")
 print(classification_report(y_test, logreg_predictions))
 #%%
-#XGB
+# ==============================
+# XGBClassifier MODEL
+# ==============================
 xgb_model = XGBClassifier()
 xgb_model.fit(X_train, y_train)
 xgb_predictions = xgb_model.predict(X_test)
@@ -110,7 +139,9 @@ print("\nXGBoost Accuracy:", xgb_accuracy)
 print("XGBoost Classification Report:")
 print(classification_report(y_test, xgb_predictions))
 #%%
-#Random Forest
+# ==============================
+# RANDOM FOREST MODEL
+# ==============================
 rf_model = RandomForestClassifier()
 rf_model.fit(X_train, y_train)
 rf_predictions = rf_model.predict(X_test)
@@ -119,7 +150,9 @@ print("\nRandom Forest Accuracy:", rf_accuracy)
 print("Random Forest Classification Report:")
 print(classification_report(y_test, rf_predictions))
 #%%
-#Desicion Tree
+# ==============================
+# DECISION TREE
+# ==============================
 de_model = DecisionTreeClassifier(max_depth=53)
 de_model.fit(X_train, y_train)
 de_model_predictions = rf_model.predict(X_test)
@@ -128,24 +161,34 @@ print("\nDecision Tree Accuracy:", de_model_accuracy)
 print("Decision Tree Classification Report:")
 print(classification_report(y_test, de_model_predictions))
 #%%
+# ==============================
 # Logistic Regression ROC Curve
+# ==============================
 logreg_probs = logreg_model.predict_proba(X_test)[:, 1]
 logreg_fpr, logreg_tpr, _ = roc_curve(y_test, logreg_probs)
 logreg_auc = roc_auc_score(y_test, logreg_probs)
+# ==============================
 # XGBoost ROC Curve
+# ==============================
 xgb_probs = xgb_model.predict_proba(X_test)[:, 1]
 xgb_fpr, xgb_tpr, _ = roc_curve(y_test, xgb_probs)
 xgb_auc = roc_auc_score(y_test, xgb_probs)
+# ==============================
 # Random Forest ROC Curve
+# ==============================
 rf_probs = rf_model.predict_proba(X_test)[:, 1]
 rf_fpr, rf_tpr, _ = roc_curve(y_test, rf_probs)
 rf_auc = roc_auc_score(y_test, rf_probs)
-
+# ==============================
 # Decison  Tree  ROC Curve
+# ==============================
 de_probs = de_model.predict_proba(X_test)[:, 1]
 de_fpr, de_tpr, _ = roc_curve(y_test, de_probs)
 de_auc = roc_auc_score(y_test, de_probs)
 #%%
+# ==============================
+# Visualization ROC
+# ==============================
 plt.figure(figsize=(10, 6))
 plt.plot(logreg_fpr, logreg_tpr, label=f'Logistic Regression (AUC = {logreg_auc:.2f})')
 plt.plot(xgb_fpr, xgb_tpr, label=f'XGBoost (AUC = {xgb_auc:.2f})')
@@ -158,7 +201,9 @@ plt.ylabel('True Positive Rate')
 plt.legend()
 plt.show()
 #%%
+# ==============================
 ## CHOOSE BEST MODEL
+# ==============================
 auc_values = [logreg_auc, xgb_auc, rf_auc, de_auc]
 model_names = ['Logistic Regression', 'XGBoost', 'Random Forest', 'Decision Tree']
 
@@ -172,8 +217,13 @@ best_model_auc = auc_values[best_model_index]
 print(f"The best model is {best_model_name} with AUC = {best_model_auc:.2f}")
 
 #%%
+# ==============================
 # TRY TO TEST DATA SET
+# ==============================
 df_test= pd.read_csv("C:/Users/Msi/Desktop/CALISMALAR/Musteri/test.csv")
+# ==============================
+# We made our categorical data categorical for test_data
+# ==============================
 
 df_test['job'] = df_test['job'].astype('category').cat.codes
 df_test['marital'] = df_test['marital'].astype('category').cat.codes
@@ -186,13 +236,25 @@ df_test['month'] = df_test['month'].astype('category').cat.codes
 df_test['poutcome'] = df_test['poutcome'].astype('category').cat.codes
 
 #%%
+# ==============================
+# Since our goal is predicted, we remove the y column from the test data
+# ==============================
 X_test = df_test.drop('y', axis=1)
 #%%
+# ==============================
+# While make prediction we are using xgb_model
+# ==============================
 y_test_pred = xgb_model.predict(X_test)
 #%%
+# ==============================
+#I'm adding a prediction column in the table to see it better.
+# ==============================
 df_test['predicted_target'] = y_test_pred
 #%%
 print(df_test[['y', 'predicted_target']])
+# ==============================
+# Visualization Confusion Matrix
+# ==============================
 #%%
 df_test['predicted_target'] = ['no' if pred == 0 else 'yes' for pred in y_test_pred]
 conf_matrix = confusion_matrix(df_test['y'], df_test['predicted_target'])
@@ -214,6 +276,9 @@ print('Classification Report:')
 print(classification_rep)
 
 #%%
+# ==============================
+# Feature Importance
+# ==============================
 feature_importance = xgb_model.feature_importances_
 feature_names = X_train.columns
 feature_importance = list(zip(feature_names, feature_importance))
